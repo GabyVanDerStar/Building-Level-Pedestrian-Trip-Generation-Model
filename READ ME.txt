@@ -1,0 +1,55 @@
+BPT-Gen: Building-Level Pedestrian Trip Generation Model for Dutch Cities
+
+DESCRIPTION
+BPT-Gen is a building-level pedestrian trip generation model adapted to the Dutch urban context.
+It produces hourly pedestrian trip estimates using only open data sources: BAG, OSM, and the ODiN travel survey.It adapts the UNA framework of Sevtsuk with Dutch walking behaviour, land-use types, and activity-based building weights, and incorporates ODiN-derived trip rates to produce hourly pedestrian trip estimates using open data (BAG, OSM, ODiN).
+
+INPUT DATA REQUIREMENTS 
+SQL access to the BAG database, including username, password, host, and database name, for importing building footprints, addresses, and associated building attributes.
+ODIN travel survey data, available as CSV or other supported formats, containing trip records with origin, destination, time, and mode information.
+Public transport line data in GeoJSON format: bus_lines.geojson, subway_lines.geojson, and tram_lines.geojson, including route geometries and stops, obtained from Overpass Turbo.
+Number of residents data in a KWB XLSX file, downloaded from CBS.
+In the input map also the parameters_building_weights holds the parameters self defined to give weights to the buildings.
+
+REPOSITORY STRUCTURE 
+/input
+	ODiN2023_Databestand.xlsx
+	kwb-2023.xlsx
+	bus_lines.geojson
+	subway_lines.geojson
+	tram_lines.geojson
+	parameters_building_weights
+
+/pedestrian_trip_generation.ipynb
+/output
+	/building_data
+		figures of building weights
+		generated building dataset
+	/network
+		figures of the adjusted weights
+		generated adjusted weights datasets
+		network with inserted building nodes 
+	/odin_trip_rates
+		figures of trip rates and odin data
+		generated trip rate data
+	/trip_generation_figures
+		figures of generated trips
+	generated_trips.csv
+
+KEY FEATURES 
+The model imports building data from OSM and BAG, including amenities, public transport stops, and parks, and combines these into a single GeoDataFrame with standardized origin types. Multipurpose buildings are assigned a single origin type based on a priority list and manual overrides. Building weights are calculated using GFA, footprint area, or fixed values, with additional weights for public transport stops based on service frequency. The pedestrian network is imported, projected, and augmented with building centroids, creating nodes on the nearest edges and connecting them appropriately. Node weights are adjusted based on the reachability of other nodes within a walking distance cutoff. ODIN travel survey data is processed to create trips, including tour splitting, weekday filtering, and mapping origins and destinations to grouped building types or transport modes. Trip rates are calculated per hour for different origin-destination combinations, combining home-based walking trips, walking legs, and transfers. Generated trips per node are computed by multiplying adjusted node weights with the corresponding trip rates, producing a final dataset of total generated trips per node with spatial geometry.Flexible for other dutch study areas by changing the OSM/BAG buffer polygon.Parameters (weights, occupancy, PT frequency) are read from Excel files for easy adjustment.
+
+OUTPUTS
+GeoJSON and CSV files for:
+	Combined building weights
+	Adjusted accessibility-based weights
+	OD trip rates
+	Generated trips for pedestrian network nodes
+Network saved as GraphML for use in routing or simulation tools.
+
+LIMITATIONS
+The model performs best for building types supported by robust ODiN trip data. Limitations include aggregation of trip purposes into broad building categories, reliance on proxy-based building weights, assumptions in accessibility parameters, underreporting in ODiN (especially short, incidental, or midday trips), and limited calibration due to scarce pedestrian count data. Outputs should be interpreted with caution where proxies, aggregated categories, or underreported trips dominate.
+
+CONTACT
+email: gaby2000star@gmail.com
+LinkedIn: www.linkedin.com/in/gabyvanderstar
